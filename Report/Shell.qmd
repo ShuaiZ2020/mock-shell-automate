@@ -2,7 +2,7 @@
 title: ""
 format:
   docx:
-    reference-doc: "C:/Users/Zhushuai/OneDrive/Work Yeedo/Other/template/shell-template.docx"
+    reference-doc: "C:/Users/zhu-s/OneDrive/Work Yeedo/Other/template/shell-template.docx"
     lang: zh
   typst:
     mainfont: "SimSun"
@@ -60,6 +60,7 @@ source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Co
 :::
 
 ```{r}
+
 dm <- make_mock_shell(formoid = "DM", 
                 row_num = 4, 
                 replace_string = T,
@@ -74,102 +75,66 @@ hw1 <- make_mock_shell(formoid = "HW1",
                 seed = "123",
                 col_pre = c()
                 )
-cbind(dm, hw1)%>%format_table()
-footnote <- c()%>%
-  add_footnote()
+table <- cbind(dm$table, hw1$table)%>%format_table()
 
+footnote <- hw1$footnote
 ```
+
+
+`r table`
 `r footnote`
-`r add_saspath()`
 
-
-::: {custom-style="SHELL-16-01-列表"}
-病史  
-全数据集
-:::
 
 ```{r}
-make_mock_shell(formoid = "MH2", 
+formoid = "MH2"
+population <- "全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = F,
                 seed = "123",
-                col_remove = c("是否有任何其他病史？"),
-                col_pre = c("受试者随机号", "随机组别", "SOC","PT"),
-                col_combine = c("SOC","PT","疾病名称 （医学术语）")
-                )%>%format_table()
-footnote <- c(
-              "SOC：系统器官分类，PT：首选术语 ",
-              "依据&MedDRA.进行编码")%>%
-  add_footnote()
-```
-`r footnote`
-`r add_saspath()`
-
-::: {custom-style="SHELL-16-01-列表"}
-HCT-CI评分  
-全数据集
-:::
-
-```{r}
-make_mock_shell(formoid = "QRS2", 
-                row_num = 4, 
-                replace_string = T,
-                seed = "123",
+                ismedDrug = T,
                 col_remove = c("是否有任何其他病史？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c()
-                )%>%format_table()
-footnote <- c()%>%
-  add_footnote()
-```
-`r footnote`
-`r add_saspath()`
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 
-::: {custom-style="SHELL-16-01-列表"}
-心动超声  
-全数据集
-:::
+```
+
+`r title`
+`r table`
+`r footnote`
 
 ```{r}
-make_mock_shell(formoid = "TU1", 
-                row_num = 4, 
-                replace_string = T,
-                seed = "123",
-                col_remove = c(),
-                col_pre = c("受试者随机号", "随机组别"),
-                col_combine = c()
-                )%>%format_table()
-footnote <- c()%>%
-  add_footnote()
-```
-`r footnote`
-`r add_saspath()`
-
-::: {custom-style="SHELL-16-01-列表"}
-病毒检查  
-全数据集
-:::
-
-```{r}
-make_mock_shell(formoid = "LB10", 
-                row_num = 4, 
-                replace_string = T,
-                seed = "123",
-                col_remove = c(),
-                col_pre = c("受试者随机号", "随机组别"),
-                col_combine = c()
-                )%>%format_table()
-footnote <- c()%>%
-  add_footnote()
-```
-`r footnote`
-`r add_saspath()`
-
-
-```{r}
-formoid <- "LB16"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+formoid = "QRS2"
 population <- "全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c("是否有任何其他病史？"),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+
+```{r}
+formoid = "TU1"
+population <- "全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -177,18 +142,62 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c()
-                )%>%format_table()
-footnote <- c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+`r title`
+`r table`
+`r footnote`
+
+
+
+
+```{r}
+formoid = "LB10"
+population <- "全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                fold_col = c("甲肝抗体", "HBV-DNA")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
+`r title`
+`r table`
+`r footnote`
 
-`r mock_shell`
-`r footnote%>%add_footnote()`
-`r add_saspath()`
+
+
+```{r}
+formoid <- "LB16"
+population <- "全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
 
 ::: {custom-style="SHELL-16-01-节标题3"}
 依从性
@@ -197,7 +206,8 @@ footnote <- c()
 ```{r}
 formoid <- "EX"
 population <- "全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -206,73 +216,66 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 filter_yes = "是否有试验用药记录？"
-                )%>%format_table()
-footnote <- c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
+`r title`
+`r table`
+`r footnote`
 
-`r mock_shell`
-`r footnote%>%add_footnote()`
-`r add_saspath()`
 
 
 ```{r}
 formoid <- "CM1"
 population <- "全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
                 seed = "123",
                 col_remove = c(),
-                col_pre = c("受试者随机号", "随机组别","ATC2", "PN"),
-                col_combine = c("ATC2", "PN"),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                iswhodrug = T,
                 filter_yes = "受试者是否有合并用药？"
-                )%>%format_table()
-footnote <- c()%>%
-  add_footnote(iswhodrug = T )
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 
 ```{r}
 formoid <- "PR1"
 population <- "全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
                 seed = "123",
                 col_remove = c(),
-                col_pre = c("受试者随机号", "随机组别","SOC", "PT"),
-                col_combine = c("SOC", "PT","治疗名称"),
+                ismedDrug = T,
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
                 filter_yes = "受试者在研究期间是否接受过非药物治疗？"
-                )%>%format_table()
+                )
 
-footnote <- c()%>%
-  add_footnote(ismedDrug = T )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 ::: {custom-style="SHELL-16-01-节标题3"}
 受试者疗效以及其他非安全性数据
@@ -281,7 +284,8 @@ footnote <- c()%>%
 ```{r}
 formoid <- "QRS5"
 population <- "全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -290,26 +294,22 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 filter_yes = ""
-                )%>%format_table()
-
-footnote <- c()%>%
-  add_footnote()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 
 ```{r}
 formoid <- "QRS6"
 population <- "全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -318,26 +318,23 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 filter_yes = ""
-                )%>%format_table()
+                )
 
-footnote <- c()%>%
-  add_footnote()
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 
 ```{r}
 formoid <- "DD"
 population <- "全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -346,25 +343,22 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 filter_yes = ""
-                )%>%format_table()
+                )
 
-footnote <- c()%>%
-  add_footnote()
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 ```{r}
 formoid <- "QRS3"
 population <- "全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -373,25 +367,22 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 filter_yes = ""
-                )%>%format_table()
+                )
 
-footnote <- c()%>%
-  add_footnote()
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 ```{r}
 formoid <- "QRS4"
 population <- "全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -400,20 +391,16 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 filter_yes = ""
-                )%>%format_table()
+                )
 
-footnote <- c()%>%
-  add_footnote()
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 ::: {custom-style="SHELL-16-01-节标题3"}
 不良事件列表
@@ -422,29 +409,27 @@ footnote <- c()%>%
 ```{r}
 formoid <- "AE"
 population <- "安全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
                 seed = "123",
                 col_remove = c("受试者是否发生任何不良事件？"),
-                col_pre = c("受试者随机号", "随机组别", "SOC","PT"),
-                col_combine = c("SOC","PT"),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                ismedDrug = T,
                 filter_yes = ""
-                )%>%format_table()
-
-footnote <- c()%>%
-  add_footnote(ismedDrug = T)
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
 
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 
 ::: {custom-style="SHELL-16-01-节标题3"}
@@ -454,7 +439,8 @@ footnote <- c()%>%
 ```{r}
 formoid <- "LB1"
 population <- "安全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -462,28 +448,26 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
-                )%>%format_table()
+                filter_yes = "",
+                fold_col = c("红细胞计数(RBC)", "嗜碱性粒细胞计数（BASO）")
+                )
 
-footnote <- c()%>%
-  add_footnote()
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 
 ```{r}
 formoid <- "LB3"
 population <- "安全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -491,27 +475,24 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
-                )%>%format_table()
-
-footnote <- c()%>%
-  add_footnote()
+                filter_yes = "",
+                fold_col = c("谷丙转氨酶(ALT)", "镁")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 ```{r}
 formoid <- "LB4"
 population <- "安全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -519,28 +500,26 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
-                )%>%format_table()
+                filter_yes = "",
+                fold_col = c("凝血酶原时间", "国际标准化比值")
+                )
 
-footnote <- c()%>%
-  add_footnote()
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 
 ```{r}
 formoid <- "LB5"
 population <- "安全数据集"
-modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
@@ -548,21 +527,17 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
-                )%>%format_table()
-
-footnote <- c()%>%
-  add_footnote()
+                filter_yes = "",
+                fold_col = c("心肌蛋白", "ProBNP")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
 ```
 
-::: {custom-style="SHELL-16-01-列表"}
-`r modulename`  
-`r population`
-:::
-
-`r mock_shell`
+`r title`
+`r table`
 `r footnote`
-`r add_saspath()`
+
 
 
 

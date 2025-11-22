@@ -13,7 +13,7 @@ make_mock_shell <- function(formoid, row_num=3,
                             col_combine = c(), col_pre = c("受试者随机号", "随机组别"), col_remove = c("单位", "备注"),
                             replace_string = F, filter_yes = "", seed = "123",
                             ismedDrug = F, iswhodrug = F,
-                            fold_col = 
+                            fold_col = c()
                             ){
   set.seed(seed)
   footnote_vec <- c()
@@ -24,7 +24,7 @@ make_mock_shell <- function(formoid, row_num=3,
     cont.type = mock_ready_crf_filename%>%pull(controlType)%>%head(1)
     if(cont.type=="水平单选框"){
       res <- mock_ready_crf_filename%>%pull(itemDataString)%>%sample(row_num, replace = T)
-    }else if(cont.type=="垂直单选框"){
+    }else if(cont.type=="垂直单选框"|cont.type=="多选框"){
       res <- mock_ready_crf_filename%>%pull(ordinal)%>%sample(row_num, replace = T)%>%
         as.character()
       footnote <- paste0(fieldname,"：",
@@ -41,6 +41,15 @@ make_mock_shell <- function(formoid, row_num=3,
                        .default = res)
     }
     return(res)
+  }
+  if(length(fold_col)!=0){
+    fold_col_vec <- fieldnames[match(fold_col[1], fieldnames) : match(fold_col[2], fieldnames)]
+    mock_ready_crf <- mock_ready_crf%>%
+      mutate(itemDataString = if_else(fieldName%in%fold_col_vec, fieldName, itemDataString),
+             controlType = if_else(fieldName%in%fold_col_vec, "水平单选框", controlType),
+             fieldName = if_else(fieldName%in%fold_col_vec, "实验室范围名称", fieldName))%>%
+      distinct(fieldName, itemDataString, .keep_all = T)
+    fieldnames <- mock_ready_crf$fieldName%>%unique()%>%setdiff(., col_remove)
   }
   field_w_value <- lapply(fieldnames, \(x) create_column(fieldname = x, row_num=row_num, date_format = date_format, replace_string = replace_string))
   setNames(field_w_value, fieldnames)
@@ -107,3 +116,11 @@ add_footnote_path <- function(footnote){
   return(res)
 }
 
+add_title <- function(formoid, population, word_style){
+  modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+  res <- paste0(c(paste0("::: {custom-style='",word_style, "'}"),
+                  paste0(modulename,"  "), 
+                  population,
+                  ":::\n"), 
+                collapse  = "\n")
+}

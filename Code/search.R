@@ -9,7 +9,7 @@ for (sh in sheets) {
   df <- read_excel(file, sheet = sh, col_types = "text")
   
   # check row contains "汉族"
-  hit_rows <- apply(df, 1, function(x) any(grepl("下限", x %||% "", fixed = TRUE)))
+  hit_rows <- apply(df, 1, function(x) any(grepl("LBORRES", x %||% "", fixed = TRUE)))
   idx <- which(hit_rows)
   
   # 如果没有匹配，跳过
