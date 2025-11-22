@@ -1,0 +1,16 @@
+
+## report
+*.docx
+*.pdf
+Report.rmd
+report.qmd
+
+## table
+*.xlsx
+*.csv
+
+## rstudio file
+.Rproj.user/
+.RData
+.Rhistory
+*.Rproj
