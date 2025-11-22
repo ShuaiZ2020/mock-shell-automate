@@ -4,6 +4,8 @@ library(openxlsx)
 crf_filed_sliced <- crf_field_full%>%
   select("formOID", "fieldOID", "fieldName", "controlType", "unit", "dataFormat", "dataDictionaryOID")
 crf_dictionary_sliced <- crf_dictionary_full%>%select(1:4)
+mock_ready_crf <- crf_filed_sliced%>%
+  left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
 
 make_mock_shell <- function(formoid, row_num=3, date_format = "YYYY-MM-DD", 
                             col_combine = c(),
@@ -11,9 +13,8 @@ make_mock_shell <- function(formoid, row_num=3, date_format = "YYYY-MM-DD",
                             col_remove = c("单位", "备注"), filter_yes = "",
                             seed = "123"){
   set.seed(seed)
-  mock_ready_crf <- crf_filed_sliced%>%filter(formOID==formoid)%>%
-    left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
-  fieldnames <- mock_ready_crf$fieldName%>%unique()%>%  setdiff(., col_remove)
+  mock_ready_crf <- mock_ready_crf%>%filter(formOID==formoid)
+  fieldnames <- mock_ready_crf$fieldName%>%unique()%>%setdiff(., col_remove)
 
   create_column<- function(fieldname, row_num, date_format){
     cont.type = mock_ready_crf%>%filter(fieldName==fieldname)%>%pull(controlType)%>%head(1)
