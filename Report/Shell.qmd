@@ -30,6 +30,7 @@ crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的�
                                  sheet = "DataDictionaryEntry")%>%as_tibble()
 crf_module_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
                                  sheet = "Module")%>%as_tibble()
+date_format = "YYYY-MM-DD"
 source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Code/shell-table-function.R"), local = knitr::knit_global())
 ```
 

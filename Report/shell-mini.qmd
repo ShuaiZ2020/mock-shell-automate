@@ -1,0 +1,115 @@
+---
+title: ""
+format:
+  docx:
+    reference-doc: "C:/Users/zhu-s/OneDrive/Work Yeedo/Other/template/shell-template.docx"
+    lang: zh
+  typst:
+    mainfont: "SimSun"
+    papersize: "presentation-16-9"
+    fontsize: 10pt
+    
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = F,warning = F, message = F)
+output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Other/Code/table_format.R"), local = knitr::knit_global())
+```
+
+```{r}
+library(dplyr)
+library(openxlsx) 
+library(flextable)
+```
+
+```{r}
+crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                            sheet = "Field")%>%as_tibble()
+crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "DataDictionaryEntry")%>%as_tibble()
+crf_module_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "Module")%>%as_tibble()
+date_format = "YYYY-MM-DD"
+source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Code/shell-table-function.R"), local = knitr::knit_global())
+```
+
+::: {custom-style="SHELL-16-01-节标题2"}
+受试者数据列表
+:::
+
+::: {custom-style="SHELL-16-01-节标题3"}
+研究受试者
+:::
+
+::: {custom-style="SHELL-16-01-节标题3"}
+方案偏离
+:::
+
+::: {custom-style="SHELL-16-01-节标题3"}
+分析集汇总
+:::
+
+::: {custom-style="SHELL-16-01-节标题3"}
+人口统计学和其他基线特征 
+:::
+
+::: {custom-style="SHELL-16-01-列表"}
+受试者人口学资料  
+全数据集
+:::
+
+```{r}
+dm <- make_mock_shell(formoid = "DM", 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c("年龄", "性别")
+                )
+
+hw1 <- make_mock_shell(formoid = "HW1", 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_pre = c()
+                )
+
+cbind(dm$table, hw1$table)%>%format_table()
+footnote <- c()%>%
+  add_footnote_path()
+
+```
+`r footnote`
+
+
+
+::: {custom-style="SHELL-16-01-节标题3"}
+不良事件列表
+:::
+
+```{r}
+formoid <- "LB3"
+population <- "安全数据集"
+modulename <- crf_module_full%>%filter(moduleOID==formoid)%>%pull(moduleName)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c("受试者是否发生任何不良事件？"),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                ismedDrug = F,
+                filter_yes = ""
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+::: {custom-style="SHELL-16-01-列表"}
+`r modulename`  
+`r population`
+:::
+
+`r table`
+`r footnote`
