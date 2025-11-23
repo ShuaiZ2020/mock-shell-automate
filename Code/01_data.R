@@ -21,11 +21,18 @@ for (f in files) {
   assign(name, df)
 }
 
-crf_database <- read.xlsx("Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
-                          sheet = "FolderModule")%>%mutate(value = "X")
-crf_database%>%pivot_wider(names_from = folderOID, id_cols = c(moduleOID, folderModuleName), values_from = value)%>%
+crf_database_FolderModule <- read.xlsx("Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                          sheet = "FolderModule")%>%mutate(value = "X")%>%
+  select(c("folderOID", "moduleOID", "folderModuleName", "value"))
+crf_database_folder <- read.xlsx("Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "Folder")%>%mutate(value = "X")%>%
+  select(c("folderOID", "folderName"))
+  
+
+crf_database_FolderModule_merge <- crf_database_FolderModule%>%left_join(crf_database_folder)
+crf_database_FolderModule_merge%>%
+  filter(moduleOID=="QRS5")
+
+
+crf_database_FolderModule%>%pivot_wider(names_from = folderOID, id_cols = c(moduleOID, folderModuleName), values_from = value)%>%
   view
-
-
-
-

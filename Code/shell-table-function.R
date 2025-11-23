@@ -1,28 +1,33 @@
 library(tidyverse)
 library(openxlsx)
 
-crf_filed_sliced <- crf_field_full%>%
-  select("formOID", "fieldOID", "fieldName", "controlType", "unit", "dataFormat", "dataDictionaryOID")
-crf_dictionary_sliced <- crf_dictionary_full%>%select(1:4)
-mock_ready_crf <- crf_filed_sliced%>%
-  left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
-
-
 
 make_mock_shell <- function(formoid, row_num=3, 
                             col_combine = c(), col_pre = c("受试者随机号", "随机组别"), col_remove = c("单位", "备注"),
-                            replace_string = F, filter_yes = "", seed = "123",
+                            replace_string = F, only_yes = T, seed = "123",
                             ismedDrug = F, iswhodrug = F,
-                            fold_col = c()
+                            col_fold = c()
                             ){
+  visit <- crf_database_FolderModule_merge%>%filter(moduleOID==formoid)%>%pull(folderName)
   set.seed(seed)
   footnote_vec <- c()
   mock_ready_crf <- mock_ready_crf%>%filter(formOID==formoid)
   fieldnames <- mock_ready_crf$fieldName%>%unique()%>%setdiff(., col_remove)
+  ### filter columns with value of yes
+  if(only_yes){
+    whether_test <- fieldnames[1]
+    fieldnames <- fieldnames[2:length(fieldnames)]
+    footnote <- paste0("此列表仅收集",
+                       whether_test%>%str_extract("(?<=是否).*?(?=？)"),
+                       ,
+                       )
+    footnote_vec <- c()
+  }
   create_column<- function(fieldname, row_num, date_format, replace_string = F){
     mock_ready_crf_filename <- mock_ready_crf%>%filter(fieldName==fieldname)
     cont.type = mock_ready_crf_filename%>%pull(controlType)%>%head(1)
     if(cont.type=="水平单选框"){
+
       res <- mock_ready_crf_filename%>%pull(itemDataString)%>%sample(row_num, replace = T)
     }else if(cont.type=="垂直单选框"|cont.type=="多选框"){
       res <- mock_ready_crf_filename%>%pull(ordinal)%>%sample(row_num, replace = T)%>%
@@ -42,25 +47,33 @@ make_mock_shell <- function(formoid, row_num=3,
     }
     return(res)
   }
-  if(length(fold_col)!=0){
-    fold_col_vec <- fieldnames[match(fold_col[1], fieldnames) : match(fold_col[2], fieldnames)]
+  if(length(col_fold)!=0){
+    col_fold_vec <- fieldnames[match(col_fold[1], fieldnames) : match(col_fold[2], fieldnames)]
     mock_ready_crf <- mock_ready_crf%>%
-      mutate(itemDataString = if_else(fieldName%in%fold_col_vec, fieldName, itemDataString),
-             controlType = if_else(fieldName%in%fold_col_vec, "水平单选框", controlType),
-             fieldName = if_else(fieldName%in%fold_col_vec, "实验室范围名称", fieldName))%>%
+      mutate(itemDataString = if_else(fieldName%in%col_fold_vec, fieldName, itemDataString),
+             controlType = if_else(fieldName%in%col_fold_vec, "水平单选框", controlType),
+             fieldName = if_else(fieldName%in%col_fold_vec, "实验室范围名称", fieldName))%>%
       distinct(fieldName, itemDataString, .keep_all = T)
     fieldnames <- mock_ready_crf$fieldName%>%unique()%>%setdiff(., col_remove)
   }
   field_w_value <- lapply(fieldnames, \(x) create_column(fieldname = x, row_num=row_num, date_format = date_format, replace_string = replace_string))
   setNames(field_w_value, fieldnames)
   shell_body <- as.data.frame(field_w_value, col.names = fieldnames, check.names =F)
+  ### add visit to table if multiple visit appear
+  if(length(visit)>1){
+    visit_col = subset_wrap(visit, 1:row_num)
+    visit_df = as.data.frame(list(visit_col), col.names = c("访视"), check.names = F)
+    res_tab <- cbind(visit_df, shell_body)
+  }else{
+    res_tab <- shell_body
+  }
   ### add column are not in form
   if(length(col_pre)==0){
-    res_tab <- shell_body
+    res_tab <- res_tab
   }else{
     field_pre <- lapply(col_pre, \(x) c(sample("xxx", row_num, replace = T)))
     shell_pre <- as.data.frame(field_pre, col.names = col_pre, check.names =F)
-    res_tab <- cbind(shell_pre, shell_body)
+    res_tab <- cbind(shell_pre, res_tab)
   }
   ### combine columns to one
   if(length(col_combine)!=0){
@@ -80,11 +93,7 @@ make_mock_shell <- function(formoid, row_num=3,
     res_tab <- res_tab%>%add_column("SOC\n/PT"=sample("xxx\n/xxx", row_num, replace = T), .after = 3)
     footnote_vec <- c(footnote_vec, "SOC：系统器官分类，PT：首选术语", "依据&MedDRA.进行编码")
   }
-  ### filter columns with value of yes
-  if(filter_yes!=""){
-    res_tab <- res_tab%>%filter(!!sym(filter_yes)=="是")%>%
-      select(-!!sym(filter_yes))
-  }
+
   res_tab[nrow(res_tab)+2,] <- "......"
   res_list <- list(table = res_tab,
                    footnote = add_footnote_path(footnote_vec))
@@ -101,7 +110,7 @@ add_footnote_path <- function(footnote){
                     paste0(footnote, collapse =  "\n\n"), 
                     ":::"
                     ), 
-                  collapse  = "\n")
+                  collapse  = "\n")%>%str_replace_all("\\~","\\\\~")
 
   }
   ### saspath
@@ -123,4 +132,7 @@ add_title <- function(formoid, population, word_style){
                   population,
                   ":::\n"), 
                 collapse  = "\n")
+}
+subset_wrap <- function(x, idx) {
+  x[(idx - 1) %% length(x) + 1]
 }

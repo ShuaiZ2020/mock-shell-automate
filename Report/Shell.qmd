@@ -4,6 +4,8 @@ format:
   docx:
     reference-doc: "C:/Users/zhu-s/OneDrive/Work Yeedo/Other/template/shell-template.docx"
     lang: zh
+    pandoc:
+      from: markdown-short_subsuperscripts
   typst:
     mainfont: "SimSun"
     papersize: "presentation-16-9"
@@ -24,12 +26,24 @@ library(flextable)
 ```
 
 ```{r}
-crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
-                            sheet = "Field")%>%as_tibble()
+crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", sheet = "Field")%>%as_tibble()
 crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
                                  sheet = "DataDictionaryEntry")%>%as_tibble()
 crf_module_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
                                  sheet = "Module")%>%as_tibble()
+crf_filed_sliced <- crf_field_full%>%
+  select("formOID", "fieldOID", "fieldName", "controlType", "unit", "dataFormat", "dataDictionaryOID")
+crf_dictionary_sliced <- crf_dictionary_full%>%select(1:4)
+mock_ready_crf <- crf_filed_sliced%>%
+  left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
+
+crf_database_FolderModule <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                          sheet = "FolderModule")%>%mutate(value = "X")%>%
+  select(c("folderOID", "moduleOID", "folderModuleName", "value"))
+crf_database_folder <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "Folder")%>%mutate(value = "X")%>%
+  select(c("folderOID", "folderName"))
+crf_database_FolderModule_merge <- crf_database_FolderModule%>%left_join(crf_database_folder)
 date_format = "YYYY-MM-DD"
 source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Code/shell-table-function.R"), local = knitr::knit_global())
 ```
@@ -165,7 +179,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                fold_col = c("甲肝抗体", "HBV-DNA")
+                col_fold = c("甲肝抗体", "HBV-DNA")
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -215,7 +229,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = "是否有试验用药记录？"
+                only_yes = T
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -240,7 +254,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 iswhodrug = T,
-                filter_yes = "受试者是否有合并用药？"
+                only_yes = "受试者是否有合并用药？"
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -265,7 +279,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 ismedDrug = T,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = "受试者在研究期间是否接受过非药物治疗？"
+                only_yes = "受试者在研究期间是否接受过非药物治疗？"
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -293,7 +307,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
+                only_yes = ""
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -317,7 +331,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
+                only_yes = ""
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -342,7 +356,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
+                only_yes = ""
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -366,7 +380,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
+                only_yes = ""
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -390,7 +404,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = ""
+                only_yes = ""
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -419,7 +433,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 ismedDrug = T,
-                filter_yes = ""
+                only_yes = ""
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -448,8 +462,8 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = "",
-                fold_col = c("红细胞计数(RBC)", "嗜碱性粒细胞计数（BASO）")
+                only_yes = "",
+                col_fold = c("红细胞计数(RBC)", "嗜碱性粒细胞计数（BASO）")
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -475,8 +489,8 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = "",
-                fold_col = c("谷丙转氨酶(ALT)", "镁")
+                only_yes = "",
+                col_fold = c("谷丙转氨酶(ALT)", "镁")
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -500,8 +514,8 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = "",
-                fold_col = c("凝血酶原时间", "国际标准化比值")
+                only_yes = "",
+                col_fold = c("凝血酶原时间", "国际标准化比值")
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -527,8 +541,8 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                filter_yes = "",
-                fold_col = c("心肌蛋白", "ProBNP")
+                only_yes = "",
+                col_fold = c("心肌蛋白", "ProBNP")
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
