@@ -4,11 +4,14 @@ format:
   docx:
     reference-doc: "C:/Users/zhu-s/OneDrive/Work Yeedo/Other/template/shell-template.docx"
     lang: zh
+    filters:
+      - docx_crossref.lua  
+  
   typst:
     mainfont: "SimSun"
     papersize: "presentation-16-9"
     fontsize: 10pt
-    
+
 ---
 
 ```{r, include=FALSE}
@@ -24,12 +27,24 @@ library(flextable)
 ```
 
 ```{r}
-crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
-                            sheet = "Field")%>%as_tibble()
+crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", sheet = "Field")%>%as_tibble()
 crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
                                  sheet = "DataDictionaryEntry")%>%as_tibble()
 crf_module_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
                                  sheet = "Module")%>%as_tibble()
+crf_filed_sliced <- crf_field_full%>%
+  select("formOID", "fieldOID", "fieldName", "controlType", "unit", "dataFormat", "dataDictionaryOID")
+crf_dictionary_sliced <- crf_dictionary_full%>%select(1:4)
+mock_ready_crf <- crf_filed_sliced%>%
+  left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
+
+crf_database_FolderModule <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                          sheet = "FolderModule")%>%mutate(value = "X")%>%
+  select(c("folderOID", "moduleOID", "folderModuleName", "value"))
+crf_database_folder <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "Folder")%>%mutate(value = "X")%>%
+  select(c("folderOID", "folderName"))
+crf_database_FolderModule_merge <- crf_database_FolderModule%>%left_join(crf_database_folder)
 date_format = "YYYY-MM-DD"
 source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Code/shell-table-function.R"), local = knitr::knit_global())
 ```
@@ -59,28 +74,6 @@ source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Co
 全数据集
 :::
 
-```{r}
-dm <- make_mock_shell(formoid = "DM", 
-                row_num = 4, 
-                replace_string = T,
-                seed = "123",
-                col_pre = c("受试者随机号", "随机组别"),
-                col_combine = c("年龄", "性别")
-                )
-
-hw1 <- make_mock_shell(formoid = "HW1", 
-                row_num = 4, 
-                replace_string = T,
-                seed = "123",
-                col_pre = c()
-                )
-
-cbind(dm$table, hw1$table)%>%format_table()
-footnote <- c()%>%
-  add_footnote_path()
-
-```
-`r footnote`
 
 
 
@@ -89,7 +82,7 @@ footnote <- c()%>%
 :::
 
 ```{r}
-formoid <- "LB3"
+formoid <- "VS2"
 population <- "安全数据集"
 word_style <- 'SHELL-16-01-列表'
 title <- add_title(formoid, population, word_style)
@@ -99,16 +92,19 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 seed = "123",
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
-
                 col_combine = c(),
-                ismedDrug = F,
-                filter_yes = "",
-                fold_col = c("谷丙转氨酶(ALT)", "镁")
+                only_yes = F,
+                col_fold = c()
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
 ```
-
 `r title`
 `r table`
-`r footnote`
+
+
+::: {custom-style='SHELL-16-01-列表' #baseline}
+肺功能检查a
+:::
+
+See item [?](#baseline)

@@ -56,31 +56,87 @@ source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Co
 研究受试者
 :::
 
-::: {custom-style="SHELL-16-01-节标题3"}
-方案偏离
-:::
+```{r}
+formoid <- "入组受试者分布"
+population <- "筛选集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+ds4 <- make_mock_shell(formoid = "DS4", 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_pre = c("受试者筛选号" ),
+                col_combine = c()
+                )
+
+ds6 <- make_mock_shell(formoid = "DS6", 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_pre = c()
+                )
+table <- cbind(ds4$table, ds6$table)%>%format_table()
+
+footnote <- ds4$footnote
+```
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "筛选失败受试者"
+population <- "筛选集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = "DS2", 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_pre = c("受试者筛选号", "知情同意书签署日期"),
+                col_combine = c(),
+                col_remove = c("受试者是否筛选成功？"),
+                no_empty = F
+                )
+
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+`r title`
+`r table`
+`r footnote`
+
 
 ::: {custom-style="SHELL-16-01-节标题3"}
 分析集汇总
 :::
 
+```{r}
+formoid <- "受试者所属分析集"
+population <- "全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+
+```
+`r title`
+
+
+
 ::: {custom-style="SHELL-16-01-节标题3"}
 人口统计学和其他基线特征 
 :::
 
-::: {custom-style="SHELL-16-01-列表"}
-受试者人口学资料  
-全数据集
-:::
-
 ```{r}
-
+formoid <- "DM"
+population <- "全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
 dm <- make_mock_shell(formoid = "DM", 
                 row_num = 4, 
                 replace_string = T,
                 seed = "123",
                 col_pre = c("受试者随机号", "随机组别"),
-                col_combine = c("年龄", "性别", "民族")
+                col_combine = c("年龄", "性别"),
+                
                 )
 
 hw1 <- make_mock_shell(formoid = "HW1", 
@@ -94,7 +150,7 @@ table <- cbind(dm$table, hw1$table)%>%format_table()
 footnote <- hw1$footnote
 ```
 
-
+`r title`
 `r table`
 `r footnote`
 
@@ -254,7 +310,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 iswhodrug = T,
-                only_yes = "受试者是否有合并用药？"
+                only_yes = T
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -279,7 +335,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 ismedDrug = T,
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = "受试者在研究期间是否接受过非药物治疗？"
+                only_yes = T
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -307,7 +363,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = ""
+                only_yes = T
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -331,7 +387,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = ""
+                only_yes = F
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -356,7 +412,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = ""
+                only_yes = F
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -380,7 +436,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = ""
+                only_yes = F
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -404,7 +460,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = ""
+                only_yes = F
                 )
 
 table <- mock_shell$table%>%format_table()
@@ -429,11 +485,12 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 row_num = 4, 
                 replace_string = T,
                 seed = "123",
-                col_remove = c("受试者是否发生任何不良事件？"),
+                col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
                 ismedDrug = T,
-                only_yes = ""
+                only_yes = T,
+                no_empty = F
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -462,7 +519,7 @@ mock_shell <- make_mock_shell(formoid = formoid,
                 col_remove = c("受试者是否发生任何不良事件？"),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = "",
+                only_yes = F,
                 col_fold = c("红细胞计数(RBC)", "嗜碱性粒细胞计数（BASO）")
                 )
 
@@ -480,16 +537,16 @@ footnote <- mock_shell$footnote
 ```{r}
 formoid <- "LB3"
 population <- "安全数据集"
-word_style <- 'SHELL-16-01-列表'
+word_style <- 'SHELL-16-01-列表续'
 title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
                 seed = "123",
-                col_remove = c("受试者是否发生任何不良事件？"),
+                col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = "",
+                only_yes = F,
                 col_fold = c("谷丙转氨酶(ALT)", "镁")
                 )
 table <- mock_shell$table%>%format_table()
@@ -505,16 +562,16 @@ footnote <- mock_shell$footnote
 ```{r}
 formoid <- "LB4"
 population <- "安全数据集"
-word_style <- 'SHELL-16-01-列表'
+word_style <- 'SHELL-16-01-列表续'
 title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
                 seed = "123",
-                col_remove = c("受试者是否发生任何不良事件？"),
+                col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = "",
+                only_yes = F,
                 col_fold = c("凝血酶原时间", "国际标准化比值")
                 )
 
@@ -532,17 +589,129 @@ footnote <- mock_shell$footnote
 ```{r}
 formoid <- "LB5"
 population <- "安全数据集"
-word_style <- 'SHELL-16-01-列表'
+word_style <- 'SHELL-16-01-列表续'
 title <- add_title(formoid, population, word_style)
 mock_shell <- make_mock_shell(formoid = formoid, 
                 row_num = 4, 
                 replace_string = T,
                 seed = "123",
-                col_remove = c("受试者是否发生任何不良事件？"),
+                col_remove = c(),
                 col_pre = c("受试者随机号", "随机组别"),
                 col_combine = c(),
-                only_yes = "",
+                only_yes = F,
                 col_fold = c("心肌蛋白", "ProBNP")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+```{r}
+formoid <- "LB6"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c("CRP", "CRP")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+```{r}
+formoid <- "LB7"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "127",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c(),
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+```{r}
+formoid <- "LB8"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c("ST2", "TNF-α")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB9"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "127",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB10"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "127",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c("甲肝抗体", "HBV-DNA")
                 )
 table <- mock_shell$table%>%format_table()
 footnote <- mock_shell$footnote
@@ -553,10 +722,280 @@ footnote <- mock_shell$footnote
 `r footnote`
 
 
+```{r}
+formoid <- "LB11"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "127",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c("CMV-DNA", "CMV抗体")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB12"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "127",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c("EBV-DNA", "EBV抗体")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB13"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "127",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB14"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "127",
+                col_remove = c(),
+                col_pre = c(),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB15"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB16"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表续'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c("T-SPOT","T-SPOT")
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
 
 
+```{r}
+formoid <- "PE"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
 
+`r title`
+`r table`
+`r footnote`
 
+```{r}
+formoid <- "QRS1"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
 
+`r title`
+`r table`
+`r footnote`
 
+```{r}
+formoid <- "TU2"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "TU3"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "VS1"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "VS2"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
 
