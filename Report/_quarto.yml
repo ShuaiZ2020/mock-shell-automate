@@ -1,0 +1,18 @@
+project:
+  type: book
+  output-dir: _output
+
+book:
+  title: "shell book"
+  chapters:
+    - shell.qmd
+
+# Global format settings
+format:
+  docx:
+    reference-doc: "C:/Users/zhushuai/OneDrive/Work Yeedo/Other/template/shell-template.docx"
+    lang: zh
+    pandoc:
+      from: markdown-short_subsuperscripts
+    filters:
+      - docx_crossref.lua   

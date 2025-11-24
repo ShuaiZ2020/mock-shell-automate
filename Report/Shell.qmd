@@ -2,15 +2,12 @@
 title: ""
 format:
   docx:
-    reference-doc: "C:/Users/zhu-s/OneDrive/Work Yeedo/Other/template/shell-template.docx"
+    reference-doc: "C:/Users/zhushuai/OneDrive/Work Yeedo/Other/template/shell-template.docx"
     lang: zh
     pandoc:
       from: markdown-short_subsuperscripts
-  typst:
-    mainfont: "SimSun"
-    papersize: "presentation-16-9"
-    fontsize: 10pt
-    
+    filters:
+      - docx_crossref.lua      
 ---
 
 ```{r, include=FALSE}

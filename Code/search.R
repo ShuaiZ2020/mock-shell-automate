@@ -1,6 +1,6 @@
 library(readxl)
 
-file <- "Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx"
+file <- "C:/Users/Zhushuai/Downloads/ydmd_2024015_gc001_spec_1.0_20240926.xlsx"
 sheets <- excel_sheets(file)
 
 results <- list()
@@ -9,7 +9,7 @@ for (sh in sheets) {
   df <- read_excel(file, sheet = sh, col_types = "text")
   
   # check row contains "汉族"
-  hit_rows <- apply(df, 1, function(x) any(grepl("LBORRES", x %||% "", fixed = TRUE)))
+  hit_rows <- apply(df, 1, function(x) any(grepl("是否进行血妊娠检查？", x %||% "", fixed = TRUE)))
   idx <- which(hit_rows)
   
   # 如果没有匹配，跳过

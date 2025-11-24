@@ -1,0 +1,96 @@
+# 附录
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = F,warning = F, message = F)
+output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Other/Code/table_format.R"), local = knitr::knit_global())
+```
+
+```{r}
+library(dplyr)
+library(openxlsx) 
+library(flextable)
+```
+
+```{r}
+crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", sheet = "Field")%>%as_tibble()
+crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "DataDictionaryEntry")%>%as_tibble()
+crf_module_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "Module")%>%as_tibble()
+crf_filed_sliced <- crf_field_full%>%
+  select("formOID", "fieldOID", "fieldName", "controlType", "unit", "dataFormat", "dataDictionaryOID")
+crf_dictionary_sliced <- crf_dictionary_full%>%select(1:4)
+mock_ready_crf <- crf_filed_sliced%>%
+  left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
+
+crf_database_FolderModule <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                          sheet = "FolderModule")%>%mutate(value = "X")%>%
+  select(c("folderOID", "moduleOID", "folderModuleName", "value"))
+crf_database_folder <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "Folder")%>%mutate(value = "X")%>%
+  select(c("folderOID", "folderName"))
+crf_database_FolderModule_merge <- crf_database_FolderModule%>%left_join(crf_database_folder)
+date_format = "YYYY-MM-DD"
+source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Code/shell-table-function.R"), local = knitr::knit_global())
+```
+
+::: {custom-style="SHELL-16-01-节标题2"}
+受试者数据列表
+:::
+
+::: {custom-style="SHELL-16-01-节标题3"}
+研究受试者
+:::
+
+::: {custom-style="SHELL-16-01-节标题3"}
+方案偏离
+:::
+
+::: {custom-style="SHELL-16-01-节标题3"}
+分析集汇总
+:::
+
+::: {custom-style="SHELL-16-01-节标题3"}
+人口统计学和其他基线特征 
+:::
+
+::: {custom-style="SHELL-16-01-列表"}
+受试者人口学资料  
+全数据集
+:::
+
+
+
+
+::: {custom-style="SHELL-16-01-节标题3"}
+不良事件列表
+:::
+
+```{r}
+formoid <- "VS2"
+population <- "安全数据集"
+word_style <- 'SHELL-16-01-列表'
+title <- add_title(formoid, population, word_style)
+mock_shell <- make_mock_shell(formoid = formoid, 
+                row_num = 4, 
+                replace_string = T,
+                seed = "123",
+                col_remove = c(),
+                col_pre = c("受试者随机号", "随机组别"),
+                col_combine = c(),
+                only_yes = F,
+                col_fold = c()
+                )
+table <- mock_shell$table%>%format_table()
+footnote <- mock_shell$footnote
+```
+`r title`
+`r table`
+
+
+::: {custom-style='SHELL-16-01-列表' #baseline}
+肺功能检查a
+:::
+
+See item [?](#baseline)

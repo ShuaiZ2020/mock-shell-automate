@@ -1,0 +1,46 @@
+# 参考但不纳入文本的表格、图示和图表
+
+
+:::{custom-style="SHELL-14-01-节标题2"}
+人口学及基线资料
+:::
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = F,warning = F, message = F)
+output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Other/Code/table_format.R"), local = knitr::knit_global())
+```
+
+```{r}
+library(tfrmt)
+library(dplyr)
+library(tidyr)
+library(gt)
+```
+
+```{r}
+
+# Create tfrmt specification
+tfrmt_spec <- tfrmt( label = label, 
+                     column = column, param = param, 
+                     body_plan = body_plan( frmt_structure(group_val =".default", 
+                                                           label_val = ".default", 
+                                                           frmt_combine( "{count} {percent}",
+                                                                         count = frmt("xxx"), 
+                                                                         percent = frmt_when("==100"~ frmt(""), 
+                                                                                             "==0"~ "",
+                                                                                             "TRUE" ~ frmt("(xx.x)"))))
+                                            ))
+
+# Create mock data
+df <- crossing(label = c("label 1", "label 2","label 3"), 
+               column = c(html("Line One<br>Line Two"), "trt1", "trt2"), 
+               param = c("count","percent"))
+
+# Print mock table using mock data
+print_mock_gt(tfrmt_spec, df)%>%as_raw_html()
+
+```
+
+
+\newpage
