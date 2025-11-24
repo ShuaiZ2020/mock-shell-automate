@@ -15,6 +15,7 @@ format:
     reference-doc: "C:/Users/zhushuai/OneDrive/Work Yeedo/Other/template/shell-template.docx"
     lang: zh
     number-sections: false
+    keep-md: true
     pandoc:
       from: markdown-short_subsuperscripts
     filters:

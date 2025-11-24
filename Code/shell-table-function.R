@@ -1,7 +1,7 @@
 library(tidyverse)
 library(openxlsx)
 library(officer)
-
+library(tfrmt)
 make_mock_shell <- function(formoid, row_num=3, 
                             col_combine = c(), col_pre = c("受试者随机号", "随机组别"), col_remove = c("单位", "备注"),
                             replace_string = F, only_yes = F, seed = "123",
@@ -158,3 +158,56 @@ add_title <- function(formoid, population, word_style){
 subset_wrap <- function(x, idx) {
   x[(idx - 1) %% length(x) + 1]
 }
+
+stack_lines <- function(text) {
+  # Split by newline
+  parts <- strsplit(text, "\n")[[1]]
+  # Wrap each part in div
+  html_parts <- paste0("<div>", parts, "</div>")
+  # Join them back together
+  html(paste(html_parts, collapse = ""))
+}
+set_tfrmt_label <- function(form_field, column){
+  body_plan = body_plan(
+    frmt_structure(group_val = ".default", label_val = "例数 (%)", 
+                   frmt_combine("{n} {prop}",
+                                n = frmt("xx"),
+                                prop = frmt("xx.x"))),
+    frmt_structure(group_val = ".default", label_val = "最小值，最大值",
+                   frmt_combine("{min},{max}",
+                                min = frmt("xx.x"),
+                                max = frmt("xx.x"))),
+    frmt_structure(group_val = ".default", label_val = "均值 (标准差)",
+                   frmt_combine("{mean} ({sd})",
+                                mean = frmt("xx.xx"),
+                                sd = frmt("xx.xxx"))),
+    frmt_structure(group_val = ".default", label_val = "中位数",
+                   frmt_combine("{median}",
+                                median = frmt("xx.x")))
+  )
+  if(!is.na(as.numeric(form_field$dataFormat))%>%all()){
+    crossing(mock_ready_crf[1,], label = c( "例数 (%)", "最小值，最大值" , "均值 (标准差)", "中位数"))%>%
+      tfrmt(group = group,
+            label = label,
+            column = column,
+            body_plan = body_plan,
+            row_grp_plan = row_grp_plan(
+              row_grp_structure(group_val = ".default",
+                                element_block(post_space = "   ")) ))
+      
+  }else{
+    form_row
+  }
+}
+
+make_mock_shell_table <- function(formoid){
+  mock_ready_crf_formoid <- mock_ready_crf%>%
+    filter(formOID==formoid, !str_detect(fieldName, "日期|时间"))%>%
+    mutate()
+  
+  mock_ready_crf_formoid%>%select(fieldName, itemDataString)
+  
+}
+
+
+

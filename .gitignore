@@ -4,7 +4,7 @@
 *.pdf
 Report.rmd
 report.qmd
-
+*docx.md
 ## table
 *.xlsx
 *.csv

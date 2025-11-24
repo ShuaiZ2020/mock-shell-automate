@@ -9,6 +9,29 @@
 knitr::opts_chunk$set(echo = F,warning = F, message = F)
 output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
 source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Other/Code/table_format.R"), local = knitr::knit_global())
+
+```
+```{r}
+crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", sheet = "Field")%>%as_tibble()
+crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "DataDictionaryEntry")%>%as_tibble()
+crf_module_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "Module")%>%as_tibble()
+crf_filed_sliced <- crf_field_full%>%
+  select("formOID", "fieldOID", "fieldName", "controlType", "unit", "dataFormat", "dataDictionaryOID")
+crf_dictionary_sliced <- crf_dictionary_full%>%select(1:4)
+mock_ready_crf <- crf_filed_sliced%>%
+  left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
+
+crf_database_FolderModule <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                          sheet = "FolderModule")%>%mutate(value = "X")%>%
+  select(c("folderOID", "moduleOID", "folderModuleName", "value"))
+crf_database_folder <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "Folder")%>%mutate(value = "X")%>%
+  select(c("folderOID", "folderName"))
+crf_database_FolderModule_merge <- crf_database_FolderModule%>%left_join(crf_database_folder)
+date_format = "YYYY-MM-DD"
+source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Code/shell-table-function.R"), local = knitr::knit_global())
 ```
 
 ```{r}
@@ -34,13 +57,58 @@ tfrmt_spec <- tfrmt( label = label,
 
 # Create mock data
 df <- crossing(label = c("label 1", "label 2","label 3"), 
-               column = c(html("Line One<br>Line Two"), "trt1", "trt2"), 
+               column = c("Line One\nN=xxx\nn (%)", "trt1", "trt2"), 
                param = c("count","percent"))
 
 # Print mock table using mock data
-print_mock_gt(tfrmt_spec, df)%>%as_raw_html()
+print_mock_gt(tfrmt_spec, df)%>%pluck("_data")%>%
+  select(1:ncol(.)-1)%>%format_table()
+  
 
 ```
 
+```{r}
+df <- bind_rows(
+  crossing(group = c("group 1", "group 2"),
+           label = c("n"),
+           column = c("PL", "T1", "T2"),
+           param = c("count")),
+  crossing(group = c("group 1", "group 2"),
+           label = c("Mean (SD)"),
+           column = c("PL", "T1", "T2"),
+           param = c("mean", "sd")),
+  crossing(group = c("group 1", "group 2"),
+           label = c("Median (Range)"),
+           column = c("PL", "T1", "T2"),
+           param = c("min", "max", "median"))) %>%
+  arrange_all()
+
+tfrmt(
+  # Specify columns in the data
+  group = group,
+  label = label,
+  column = column,
+  param = param,
+  value = value,
+  row_grp_plan = row_grp_plan(
+    row_grp_structure(group_val = ".default",
+                      element_block(post_space = "   ")) ),
+
+  # Specify body plan
+  body_plan = body_plan(
+    frmt_structure(group_val = ".default", label_val = "n", frmt("xx")),
+    frmt_structure(group_val = ".default", label_val = "Median (Range)",
+                   frmt_combine("{median} ({min},{max})",
+                                median = frmt("xx.x"),
+                                min = frmt("xx"),
+                                max = frmt("xx"), missing = " ")),
+    frmt_structure(group_val = ".default", label_val = "Mean (SD)",
+                   frmt_combine("{mean} ({sd})",
+                                mean = frmt("xx.x"),
+                                sd = frmt("xx.xx"), missing = " "))
+  ))%>%
+  print_mock_gt(df)%>%pluck("_data")%>%
+  select(1:ncol(.)-1)%>%format_table()
+```
 
 \newpage
