@@ -11,6 +11,14 @@ output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
 source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Other/Code/table_format.R"), local = knitr::knit_global())
 
 ```
+
+```{r}
+library(tfrmt)
+library(tidyverse)
+library(openxlsx)
+library(gt)
+```
+
 ```{r}
 crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", sheet = "Field")%>%as_tibble()
 crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
@@ -34,81 +42,11 @@ date_format = "YYYY-MM-DD"
 source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Code/shell-table-function.R"), local = knitr::knit_global())
 ```
 
-```{r}
-library(tfrmt)
-library(dplyr)
-library(tidyr)
-library(gt)
-```
 
 ```{r}
-
-# Create tfrmt specification
-tfrmt_spec <- tfrmt( label = label, 
-                     column = column, param = param, 
-                     body_plan = body_plan( frmt_structure(group_val =".default", 
-                                                           label_val = ".default", 
-                                                           frmt_combine( "{count} {percent}",
-                                                                         count = frmt("xxx"), 
-                                                                         percent = frmt_when("==100"~ frmt(""), 
-                                                                                             "==0"~ "",
-                                                                                             "TRUE" ~ frmt("(xx.x)"))))
-                                            ))
-
-# Create mock data
-df <- crossing(label = c("label 1", "label 2","label 3"), 
-               column = c("Line One\nN=xxx\nn (%)", "trt1", "trt2"), 
-               param = c("count","percent"))
-
-# Print mock table using mock data
-print_mock_gt(tfrmt_spec, df)%>%pluck("_data")%>%
-  select(1:ncol(.)-1)%>%format_table()
-  
-
+make_mock_shell_table("DM")%>%set_header_labels("label"="")
 ```
 
-```{r}
-df <- bind_rows(
-  crossing(group = c("group 1", "group 2"),
-           label = c("n"),
-           column = c("PL", "T1", "T2"),
-           param = c("count")),
-  crossing(group = c("group 1", "group 2"),
-           label = c("Mean (SD)"),
-           column = c("PL", "T1", "T2"),
-           param = c("mean", "sd")),
-  crossing(group = c("group 1", "group 2"),
-           label = c("Median (Range)"),
-           column = c("PL", "T1", "T2"),
-           param = c("min", "max", "median"))) %>%
-  arrange_all()
 
-tfrmt(
-  # Specify columns in the data
-  group = group,
-  label = label,
-  column = column,
-  param = param,
-  value = value,
-  row_grp_plan = row_grp_plan(
-    row_grp_structure(group_val = ".default",
-                      element_block(post_space = "   ")) ),
-
-  # Specify body plan
-  body_plan = body_plan(
-    frmt_structure(group_val = ".default", label_val = "n", frmt("xx")),
-    frmt_structure(group_val = ".default", label_val = "Median (Range)",
-                   frmt_combine("{median} ({min},{max})",
-                                median = frmt("xx.x"),
-                                min = frmt("xx"),
-                                max = frmt("xx"), missing = " ")),
-    frmt_structure(group_val = ".default", label_val = "Mean (SD)",
-                   frmt_combine("{mean} ({sd})",
-                                mean = frmt("xx.x"),
-                                sd = frmt("xx.xx"), missing = " "))
-  ))%>%
-  print_mock_gt(df)%>%pluck("_data")%>%
-  select(1:ncol(.)-1)%>%format_table()
-```
 
 \newpage

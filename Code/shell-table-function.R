@@ -2,6 +2,7 @@ library(tidyverse)
 library(openxlsx)
 library(officer)
 library(tfrmt)
+library(flextable)
 make_mock_shell <- function(formoid, row_num=3, 
                             col_combine = c(), col_pre = c("受试者随机号", "随机组别"), col_remove = c("单位", "备注"),
                             replace_string = F, only_yes = F, seed = "123",
@@ -167,46 +168,78 @@ stack_lines <- function(text) {
   # Join them back together
   html(paste(html_parts, collapse = ""))
 }
-set_tfrmt_label <- function(form_field, column){
-  body_plan = body_plan(
-    frmt_structure(group_val = ".default", label_val = "例数 (%)", 
-                   frmt_combine("{n} {prop}",
-                                n = frmt("xx"),
-                                prop = frmt("xx.x"))),
-    frmt_structure(group_val = ".default", label_val = "最小值，最大值",
-                   frmt_combine("{min},{max}",
-                                min = frmt("xx.x"),
-                                max = frmt("xx.x"))),
-    frmt_structure(group_val = ".default", label_val = "均值 (标准差)",
-                   frmt_combine("{mean} ({sd})",
-                                mean = frmt("xx.xx"),
-                                sd = frmt("xx.xxx"))),
-    frmt_structure(group_val = ".default", label_val = "中位数",
-                   frmt_combine("{median}",
-                                median = frmt("xx.x")))
-  )
+set_tfrmt_label <- function(form_field, fieldname, column){
+  fieldname <- fieldname%>%unlist()
   if(!is.na(as.numeric(form_field$dataFormat))%>%all()){
-    crossing(mock_ready_crf[1,], label = c( "例数 (%)", "最小值，最大值" , "均值 (标准差)", "中位数"))%>%
-      tfrmt(group = group,
-            label = label,
-            column = column,
-            body_plan = body_plan,
-            row_grp_plan = row_grp_plan(
-              row_grp_structure(group_val = ".default",
-                                element_block(post_space = "   ")) ))
+
+    df_filedname <- bind_rows(expand_grid(group = fieldname, column = column, label = c("例数 (%)"), param = c("n", "prop")),
+                              expand_grid(group = fieldname, column = column, label = c("均值 (标准差)"), param = c("mean", "sd")),
+                              expand_grid(group = fieldname, column = column, label = c("中位数"), param = "median"),
+                              expand_grid(group = fieldname, column = column, label = c("最小值，最大值"), param = c("min", "max"))
+    )
+    
+    res <- tfrmt(group = "group",
+          label = "label",
+          column = "column",
+          param = "param",
+          body_plan = body_plan(
+            frmt_structure(group_val = ".default", label_val = "例数 (%)", 
+                           frmt_combine("{n} ({prop})",
+                                        n = frmt("xx"), prop = frmt("xx.x"))),
+            frmt_structure(group_val = ".default", label_val = "最小值，最大值",
+                           frmt_combine("{min}, {max}",
+                                        min = frmt("xx.x"), max = frmt("xx.x"))),
+            frmt_structure(group_val = ".default", label_val = "均值 (标准差)",
+                           frmt_combine("{mean} ({sd})",
+                                        mean = frmt("xx.xx"), sd = frmt("xx.xxx"))),
+            frmt_structure(group_val = ".default", label_val = "中位数", median = frmt("xx.xx"))
+          ),
+          row_grp_plan = row_grp_plan(
+            row_grp_structure(group_val = ".default",
+                              element_block(post_space = "   ")
+                              ) 
+            )
+          ) %>%
+      print_mock_gt(df_filedname) 
+    
       
   }else{
-    form_row
+    df_filedname <- expand_grid(fieldname= fieldname, group = form_field$itemDataString, column = column, param = c("n", "prop"))
+    res <- tfrmt(
+      # Specify columns in the data
+      group = "fieldname",
+      label = "group",
+      column = "column",
+      param = "param",
+      row_grp_plan = row_grp_plan(
+        row_grp_structure(group_val = ".default",
+                          element_block(post_space = "   "))),
+      
+      # Specify body plan
+      body_plan = body_plan(
+        frmt_structure(group_val = ".default", label_val = ".default",
+                       frmt_combine("{n} ({prop})",
+                                    n = frmt("xx.x"),
+                                    prop = frmt("xx.x")))
+      ))%>%print_mock_gt(df_filedname)
+    
   }
+  res
 }
 
 make_mock_shell_table <- function(formoid){
   mock_ready_crf_formoid <- mock_ready_crf%>%
     filter(formOID==formoid, !str_detect(fieldName, "日期|时间"))%>%
     mutate()
-  
-  mock_ready_crf_formoid%>%select(fieldName, itemDataString)
-  
+  tfrmt_table_list <- mock_ready_crf_formoid%>%
+    group_by(fieldName)%>%
+    group_map(\(x, y) {
+      res <-   set_tfrmt_label(form_field = x, fieldname = y, column = c("试验组\nN=xxx\nn (%)", "对照组\nN=xxx\nn (%)", "合计\nN=xxx\nn (%)"))
+      res <- res%>%pluck("_data")%>%select(-last_col())%>%slice(-nrow(.))%>%add_row()
+      })
+  tfrmt_table <- data.table::rbindlist(tfrmt_table_list, use.names = F)
+  colnames(tfrmt_table)[1] <- NA
+  tfrmt_table%>%format_table()
 }
 
 
