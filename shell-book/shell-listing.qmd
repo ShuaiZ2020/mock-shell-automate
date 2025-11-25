@@ -43,7 +43,7 @@ ds6 <- make_mock_shell(formoid = "DS6",
                 )
 table <- cbind(ds4$table, ds6$table)%>%format_table()
 
-footnote <- ds4$footnote
+footnote <- ds6$footnote
 ```
 `r title`
 `r table`

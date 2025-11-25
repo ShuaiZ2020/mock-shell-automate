@@ -23,15 +23,37 @@ for (f in files) {
 
 crf_database_FolderModule <- read.xlsx("Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
                           sheet = "FolderModule")%>%mutate(value = "X")%>%
-  select(c("folderOID", "moduleOID", "folderModuleName", "value"))
+  select(c("folderOID", "moduleOID", "folderModuleName", "value"))%>%as_tibble()
+
 crf_database_folder <- read.xlsx("Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
                                  sheet = "Folder")%>%mutate(value = "X")%>%
-  select(c("folderOID", "folderName"))
-  
+  select(c("folderOID", "folderName"))%>%as_tibble()
+crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", sheet = "Field")%>%as_tibble()
+crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                                 sheet = "DataDictionaryEntry")%>%as_tibble()
+crf_module_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
+                             sheet = "Module")%>%as_tibble()
+crf_filed_sliced <- crf_field_full%>%
+  select("formOID", "fieldOID", "fieldName", "controlType", "unit", "dataFormat", "dataDictionaryOID")
 
-crf_database_FolderModule_merge <- crf_database_FolderModule%>%left_join(crf_database_folder)
-crf_database_FolderModule_merge%>%
-  filter(moduleOID=="QRS5")
+crf_dictionary_sliced <- crf_dictionary_full%>%select(1:4)
+
+crf_database_FolderModule_merge <- crf_database_FolderModule%>%
+  left_join(crf_database_folder)
+
+mock_ready_crf <- crf_filed_sliced%>%
+  left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
+
+
+crf_all <- crf_database_FolderModule%>%select(1:3)%>%
+  left_join(mock_ready_crf, join_by(moduleOID==formOID))%>%
+  write.xlsx("Data/crf_all.xlsx")
+
+
+
+
+
+
 
 
 crf_database_FolderModule%>%pivot_wider(names_from = folderOID, id_cols = c(moduleOID, folderModuleName), values_from = value)%>%

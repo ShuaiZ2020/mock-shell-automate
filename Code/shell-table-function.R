@@ -136,9 +136,25 @@ add_footnote_path <- function(footnote){
                             "::: {custom-style='路径'}", 
                             "&lt;路径&gt;/< XXX.SAS>   space_space_space draft YYYY-MM-DD HH:MM", 
                             ":::",
-                            "\n<br>",
-                            "<br>\n"), 
+                            "\n<br>\n",
+                            "<br>\n\n<br>\n\n<br>\n"), 
                           collapse  = "\n")
+
+
+  ### programing_note
+  res_pn_header <-   paste0(c("\n\n<br>\n",
+                            "::: {custom-style='编程说明'}", 
+                            "编程说明：",
+                            ":::",
+                            "\n"), 
+                          collapse  = "\n")
+  res_pn_body <-  paste0(c("\n\n<br>\n",
+                           "::: {custom-style='编程说明正文'}", 
+                           "检查项目",
+                           ":::",
+                           "\n"), 
+                         collapse  = "\n")
+  
   res <- paste0(res_footnote, res_saspath)
   return(res)
 }
@@ -256,5 +272,11 @@ make_mock_shell_table <- function(formoid, column, footnote_vec){
   res_list
 }
 
-
+make_mock_shell_table_clinical_change <- function(formoid, column, footnote_vec){
+  mock_ready_crf_formoid <- mock_ready_crf%>%
+    filter(formOID==formoid, !str_detect(fieldName, "日期|时间"))%>%
+    mutate(fieldName = if_else(str_detect(fieldName,"是否"), NA, fieldName))%>%
+    drop_na(fieldName)
+  
+}
 
