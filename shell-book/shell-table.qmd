@@ -1,51 +1,519 @@
 # 参考但不纳入文本的表格、图示和图表
 
-
-:::{custom-style="SHELL-14-01-节标题2"}
-人口学及基线资料
-:::
-
 ```{r, include=FALSE}
 knitr::opts_chunk$set(echo = F,warning = F, message = F)
 output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
 source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Other/Code/table_format.R"), local = knitr::knit_global())
+```
+```{r}
+source("../Code/book_script.R", local = knitr::knit_global())
+```
+```{r}
+source("../Code/shell-table-function.R", local = knitr::knit_global())
+```
+```{r}
+column = c("试验组", "对照组", "合计")
+```
+
+
+:::{custom-style="SHELL-14-01-节标题2"}
+人口学及基线资料
+:::
+```{r}
+formoid <- "入组受试者分布"
+population <- "筛选集"
+word_style <- "SHELL-14-01-表"
+title <- add_title(formoid, population, word_style)
 
 ```
+
+`r title`
 
 ```{r}
-library(tfrmt)
-library(tidyverse)
-library(openxlsx)
-library(gt)
-```
+formoid <- "受试者筛选情况汇总"
+population <- "筛选集"
+word_style <- 'SHELL-14-01-表续'
+title <- add_title(formoid, population, word_style)
 
-```{r}
-crf_field_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", sheet = "Field")%>%as_tibble()
-crf_dictionary_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
-                                 sheet = "DataDictionaryEntry")%>%as_tibble()
-crf_module_full <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
-                                 sheet = "Module")%>%as_tibble()
-crf_filed_sliced <- crf_field_full%>%
-  select("formOID", "fieldOID", "fieldName", "controlType", "unit", "dataFormat", "dataDictionaryOID")
-crf_dictionary_sliced <- crf_dictionary_full%>%select(1:4)
-mock_ready_crf <- crf_filed_sliced%>%
-  left_join(crf_dictionary_sliced, by = join_by(dataDictionaryOID == dataDictionaryOID))
-
-crf_database_FolderModule <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
-                          sheet = "FolderModule")%>%mutate(value = "X")%>%
-  select(c("folderOID", "moduleOID", "folderModuleName", "value"))
-crf_database_folder <- read.xlsx("../Background/ydmd_2025027_iMSC预防aGvHD的前瞻性临床研究_spec_1.0_20250427.xlsx", 
-                                 sheet = "Folder")%>%mutate(value = "X")%>%
-  select(c("folderOID", "folderName"))
-crf_database_FolderModule_merge <- crf_database_FolderModule%>%left_join(crf_database_folder)
-date_format = "YYYY-MM-DD"
-source(paste0(Sys.getenv("USERPROFILE"),"/OneDrive/Work Yeedo/Project/2025027/Code/shell-table-function.R"), local = knitr::knit_global())
 ```
+`r title`
 
 
 ```{r}
-make_mock_shell_table("DM")%>%set_header_labels("label"="")
+formoid = "DM"
+population = "筛选集"
+title <- add_title(formoid, population, "SHELL-14-01-表")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("label" = "")
+footnote <- mock_shell$footnote
 ```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid = "MH2"
+population = "筛选集"
+title <- add_title(formoid, population, "SHELL-14-01-表")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+
+
+```{r}
+formoid = "QRS2"
+population <- "全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid = "TU1"
+population <- "全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid = "LB10"
+population <- "全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB16"
+population <- "全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+:::{custom-style="SHELL-14-01-节标题2"}
+疗效和其他非安全性数据
+:::
+
+:::{custom-style="SHELL-14-01-节标题2"}
+安全性数据
+:::
+
+```{r}
+formoid <- "CM1"
+population <- "全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "PR1"
+population <- "全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB1"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB3"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB4"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB5"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB6"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB7"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB8"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB9"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB10"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB11"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB12"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB13"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB14"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "LB15"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+
+```{r}
+formoid <- "LB16"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "PE"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "QRS1"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "TU2"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "TU3"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "VS1"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
+```{r}
+formoid <- "VS2"
+population <- "安全数据集"
+title <- add_title(formoid, population, "SHELL-14-01-表续")
+mock_shell <- make_mock_shell_table(formoid = formoid, 
+                                    column= column, 
+                                    footnote_vec = c()
+                                    )
+table <- mock_shell$table%>%set_header_labels("group" = "")
+footnote <- mock_shell$footnote
+```
+
+`r title`
+`r table`
+`r footnote`
+
 
 
 

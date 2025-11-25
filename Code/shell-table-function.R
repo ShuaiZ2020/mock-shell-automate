@@ -150,28 +150,27 @@ add_title <- function(formoid, population, word_style){
   }else{
     modulename <- formoid
   }
-  res <- paste0(c(paste0("::: {custom-style='",word_style, "'}"),
-                  paste0(modulename,"  "), 
-                  population,
-                  ":::\n"), 
-                collapse  = "\n")
+  if (str_detect(word_style, "列表")){
+    res <- paste0(c(paste0("::: {custom-style='",word_style, "' #", formoid,"}"),
+                    paste0(modulename,"  "), 
+                    population,
+                    ":::\n"), 
+                  collapse  = "\n")
+  }else{
+    res <- paste0(c(paste0("::: {custom-style='",word_style, "'}"),
+                    paste0(modulename,"  "), 
+                    population,
+                    ":::\n"), 
+                  collapse  = "\n")
+  }
 }
 subset_wrap <- function(x, idx) {
   x[(idx - 1) %% length(x) + 1]
 }
 
-stack_lines <- function(text) {
-  # Split by newline
-  parts <- strsplit(text, "\n")[[1]]
-  # Wrap each part in div
-  html_parts <- paste0("<div>", parts, "</div>")
-  # Join them back together
-  html(paste(html_parts, collapse = ""))
-}
 set_tfrmt_label <- function(form_field, fieldname, column){
   fieldname <- fieldname%>%unlist()
   if(!is.na(as.numeric(form_field$dataFormat))%>%all()){
-
     df_filedname <- bind_rows(expand_grid(group = fieldname, column = column, label = c("例数 (%)"), param = c("n", "prop")),
                               expand_grid(group = fieldname, column = column, label = c("均值 (标准差)"), param = c("mean", "sd")),
                               expand_grid(group = fieldname, column = column, label = c("中位数"), param = "median"),
@@ -201,10 +200,9 @@ set_tfrmt_label <- function(form_field, fieldname, column){
             )
           ) %>%
       print_mock_gt(df_filedname) 
-    
-      
   }else{
-    df_filedname <- expand_grid(fieldname= fieldname, group = form_field$itemDataString, column = column, param = c("n", "prop"))
+    df_filedname <- expand_grid(fieldname= fieldname, group = c(form_field$itemDataString,"缺失"), 
+                                column = column, param = c("n", "prop"))
     res <- tfrmt(
       # Specify columns in the data
       group = "fieldname",
@@ -227,19 +225,35 @@ set_tfrmt_label <- function(form_field, fieldname, column){
   res
 }
 
-make_mock_shell_table <- function(formoid){
+make_mock_shell_table <- function(formoid, column, footnote_vec){
   mock_ready_crf_formoid <- mock_ready_crf%>%
     filter(formOID==formoid, !str_detect(fieldName, "日期|时间"))%>%
-    mutate()
+    mutate(fieldName = if_else(str_detect(fieldName,"是否"), NA, fieldName))%>%
+    drop_na(fieldName)
+  mock_ready_crf_formoid$fieldName <- mock_ready_crf_formoid$fieldName%>%factor(levels = unique(.))
+  if(is.na(as.numeric(mock_ready_crf_formoid$dataFormat))%>%all() ){
+    column <- paste0(column, "\nN=xxx\nn (%)")
+  }else{
+    column <- paste0(column, "\nN=xxx")
+  }
   tfrmt_table_list <- mock_ready_crf_formoid%>%
     group_by(fieldName)%>%
     group_map(\(x, y) {
-      res <-   set_tfrmt_label(form_field = x, fieldname = y, column = c("试验组\nN=xxx\nn (%)", "对照组\nN=xxx\nn (%)", "合计\nN=xxx\nn (%)"))
+      res <-   set_tfrmt_label(form_field = x, fieldname = y, column = column)
       res <- res%>%pluck("_data")%>%select(-last_col())%>%slice(-nrow(.))%>%add_row()
+      colnames(res)[1] <-"group" 
+      res
       })
   tfrmt_table <- data.table::rbindlist(tfrmt_table_list, use.names = F)
   colnames(tfrmt_table)[1] <- NA
-  tfrmt_table%>%format_table()
+  res_tab <- tfrmt_table%>%
+    format_table()%>%
+    align(j = c(2:ncol(tfrmt_table)), align =c("center"), part = "all" )
+  footnote_vec <- c(paste0("数据来源：[?](#", formoid,")"), 
+                    footnote_vec)
+  res_list <- list(table = res_tab,
+                   footnote = add_footnote_path(footnote_vec))
+  res_list
 }
 
 
