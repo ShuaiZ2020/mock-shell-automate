@@ -46,9 +46,6 @@ make_mock_shell <- function(formoid, row_num=3,
         footnote_vec <<- c(footnote_vec, footnote)
       }
 
-    }
-    else if(cont.type == "日期框"){
-      res <- sample(x = date_format, row_num, replace = T)
     }else{
       res <- sample(x = "xxx", row_num, replace = T)
     }
